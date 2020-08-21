@@ -1,0 +1,12 @@
+# Book settings
+title : Data Science with PySpark
+author: David Kearney
+logo: logo.png
+
+# Information about where the book exists on the web
+description: >-
+  A Book on Data Science book with PySpark
+
+latex:
+  latex_documents:
+    targetname: book.tex
