@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>6. Pyspark Regression with Fiscal Data &#8212; Data Science with PySpark</title>
+    <title>5. Pyspark Regression with Fiscal Data &#8212; Data Science with PySpark</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="_static/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="_static/sphinx-book-theme.css" type="text/css" />
@@ -39,8 +39,8 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="7. Dataframes, Formatting, Casting Data Type and Correlation with Pyspark" href="2020-08-20-Pyspark-Dataframes-Data-Types.html" />
-    <link rel="prev" title="5. Linear Regression and Random Forest/GBT Classification with Pyspark" href="2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark.html" />
+    <link rel="next" title="6. Dataframes, Formatting, Casting Data Type and Correlation with Pyspark" href="2020-08-20-Pyspark-Dataframes-Data-Types.html" />
+    <link rel="prev" title="4. Linear Regression and Random Forest/GBT Classification with Pyspark" href="2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="docsearch:language" content="en">
@@ -75,8 +75,8 @@
 <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <ul class="nav sidenav_l1">
  <li class="toctree-l1">
-  <a class="reference internal" href="2020-08-22-Window functions and Pivot Tables with Pyspark.html">
-   Window functions and Pivot Tables with Pyspark
+  <a class="reference internal" href="intro.html">
+   Data Science with PySpark
   </a>
  </li>
 </ul>
@@ -87,48 +87,33 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="intro.html">
-   2. Data Science Book
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="markdown.html">
-   3. Markdown Files
+  <a class="reference internal" href="2020-08-22-Window functions and Pivot Tables with Pyspark.html">
+   2. Window functions and Pivot Tables with Pyspark
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="2020-08-19-Pyspark-Filtering.html">
-   4. Dataframe Filitering and Operations with Pyspark
+   3. Dataframe Filitering and Operations with Pyspark
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark.html">
-   5. Linear Regression and Random Forest/GBT Classification with Pyspark
+   4. Linear Regression and Random Forest/GBT Classification with Pyspark
   </a>
  </li>
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   6. Pyspark Regression with Fiscal Data
+   5. Pyspark Regression with Fiscal Data
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="2020-08-20-Pyspark-Dataframes-Data-Types.html">
-   7. Dataframes, Formatting, Casting Data Type and Correlation with Pyspark
+   6. Dataframes, Formatting, Casting Data Type and Correlation with Pyspark
   </a>
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="2020-08-18-Pyspark-NAs.html">
-   8. Handling Missing Data with Pyspark
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="notebooks.html">
-   9. Content with notebooks
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="content.html">
-   10. Content in Jupyter Book
+   7. Handling Missing Data with Pyspark
   </a>
  </li>
 </ul>
@@ -203,22 +188,22 @@
             <ul class="nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#loading-in-the-data">
-   6.1. Loading in the data
+   5.1. Loading in the data
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#spark-sql">
-   6.2. Spark SQL
+   5.2. Spark SQL
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#vectorassembler-and-linearregression">
-   6.3. VectorAssembler and LinearRegression
+   5.3. VectorAssembler and LinearRegression
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#evaluation-and-metrics">
-   6.4. Evaluation and Metrics
+   5.4. Evaluation and Metrics
   </a>
  </li>
 </ul>
@@ -232,7 +217,7 @@
               <div>
                 
   <div class="section" id="pyspark-regression-with-fiscal-data">
-<h1><span class="section-number">6. </span>Pyspark Regression with Fiscal Data<a class="headerlink" href="#pyspark-regression-with-fiscal-data" title="Permalink to this headline">¶</a></h1>
+<h1><span class="section-number">5. </span>Pyspark Regression with Fiscal Data<a class="headerlink" href="#pyspark-regression-with-fiscal-data" title="Permalink to this headline">¶</a></h1>
 <blockquote>
 <div><p>“A minimal example of using Pyspark for Linear Regression”</p>
 </div></blockquote>
@@ -245,7 +230,7 @@
 <li><p>title: Pyspark Regression with Fiscal Data</p></li>
 </ul>
 <div class="section" id="loading-in-the-data">
-<h2><span class="section-number">6.1. </span>Loading in the data<a class="headerlink" href="#loading-in-the-data" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.1. </span>Loading in the data<a class="headerlink" href="#loading-in-the-data" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#collapse-hide</span>
@@ -277,7 +262,7 @@
 </div>
 </div>
 <div class="section" id="spark-sql">
-<h2><span class="section-number">6.2. </span>Spark SQL<a class="headerlink" href="#spark-sql" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.2. </span>Spark SQL<a class="headerlink" href="#spark-sql" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">createOrReplaceTempView</span><span class="p">(</span><span class="s2">&quot;fiscal_stats&quot;</span><span class="p">)</span>
@@ -547,7 +532,7 @@ year|total_yearly_it|total_yearly_fr|
 </div>
 </div>
 <div class="section" id="vectorassembler-and-linearregression">
-<h2><span class="section-number">6.3. </span>VectorAssembler and LinearRegression<a class="headerlink" href="#vectorassembler-and-linearregression" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.3. </span>VectorAssembler and LinearRegression<a class="headerlink" href="#vectorassembler-and-linearregression" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.ml.feature</span> <span class="kn">import</span> <span class="n">VectorAssembler</span>
@@ -658,7 +643,7 @@ R2: 0.512023
 </div>
 </div>
 <div class="section" id="evaluation-and-metrics">
-<h2><span class="section-number">6.4. </span>Evaluation and Metrics<a class="headerlink" href="#evaluation-and-metrics" title="Permalink to this headline">¶</a></h2>
+<h2><span class="section-number">5.4. </span>Evaluation and Metrics<a class="headerlink" href="#evaluation-and-metrics" title="Permalink to this headline">¶</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lr_predictions</span> <span class="o">=</span> <span class="n">lr_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_df</span><span class="p">)</span>
@@ -932,8 +917,8 @@ Root Mean Squared Error (RMSE) on test data = 778728
     
     <div class='prev-next-bottom'>
         
-    <a class='left-prev' id="prev-link" href="2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark.html" title="previous page"><span class="section-number">5. </span>Linear Regression and Random Forest/GBT Classification with Pyspark</a>
-    <a class='right-next' id="next-link" href="2020-08-20-Pyspark-Dataframes-Data-Types.html" title="next page"><span class="section-number">7. </span>Dataframes, Formatting, Casting Data Type and Correlation with Pyspark</a>
+    <a class='left-prev' id="prev-link" href="2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark.html" title="previous page"><span class="section-number">4. </span>Linear Regression and Random Forest/GBT Classification with Pyspark</a>
+    <a class='right-next' id="next-link" href="2020-08-20-Pyspark-Dataframes-Data-Types.html" title="next page"><span class="section-number">6. </span>Dataframes, Formatting, Casting Data Type and Correlation with Pyspark</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">

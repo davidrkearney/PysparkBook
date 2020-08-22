@@ -120,21 +120,3 @@ expression = f"stack({cnt}, {expression[:-1]}) as (Type,Value)"
 
 unpivoted_df = pivoted_df.select('year',F.expr(expression))
 unpivoted_df.show()
-
-
-```{toctree}
-:hidden:
-:titlesonly:
-:numbered: 
-
-2020-08-21-RDDs and Schemas and Data Types with Pyspark
-intro
-markdown
-2020-08-19-Pyspark-Filtering
-2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark
-2020-08-15-Pyspark-Fiscal-Data-Regression
-2020-08-20-Pyspark-Dataframes-Data-Types
-2020-08-18-Pyspark-NAs
-notebooks
-content
-```

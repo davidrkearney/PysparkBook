@@ -1,13 +1,11 @@
-file: 2020-08-22-Window functions and Pivot Tables with Pyspark
+file: intro
 numbered: true
 sections:
 - file: 2020-08-21-RDDs and Schemas and Data Types with Pyspark
-- file: intro
-- file: markdown
+- file: 2020-08-22-Window functions and Pivot Tables with Pyspark
 - file: 2020-08-19-Pyspark-Filtering
 - file: 2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark
 - file: 2020-08-15-Pyspark-Fiscal-Data-Regression
 - file: 2020-08-20-Pyspark-Dataframes-Data-Types
 - file: 2020-08-18-Pyspark-NAs
-- file: notebooks
-- file: content
+
