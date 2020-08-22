@@ -95,6 +95,560 @@ Data Science with PySpark
 \end{sphinxadmonition}
 
 
+\chapter{Pyspark Regression with Fiscal Data}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:pyspark-regression-with-fiscal-data}}\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression::doc}}\begin{quote}
+
+“A minimal example of using Pyspark for Linear Regression”
+\end{quote}
+\begin{itemize}
+\item {} 
+toc: true\sphinxhyphen{} branch: master\sphinxhyphen{} badges: true
+
+\item {} 
+comments: true
+
+\item {} 
+author: David Kearney
+
+\item {} 
+categories: {[}pyspark, jupyter{]}
+
+\item {} 
+description: A minimal example of using Pyspark for Linear Regression
+
+\item {} 
+title: Pyspark Regression with Fiscal Data
+
+\end{itemize}
+
+
+\section{Bring in needed imports}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:bring-in-needed-imports}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{col}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{types} \PYG{k+kn}{import} \PYG{n}{StringType}\PYG{p}{,}\PYG{n}{BooleanType}\PYG{p}{,}\PYG{n}{DateType}\PYG{p}{,}\PYG{n}{IntegerType}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{o}{*}
+\end{sphinxVerbatim}
+
+
+\section{Load data from CSV}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:load-data-from-csv}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}collapse\PYGZhy{}hide}
+
+\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
+\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
+\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{createOrReplaceTempView}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fiscal\PYGZus{}stats}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{sums} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{sql}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+s2}{select year, sum(it) as total\PYGZus{}yearly\PYGZus{}it, sum(fr) as total\PYGZus{}yearly\PYGZus{}fr}
+\PYG{l+s+s2}{from fiscal\PYGZus{}stats}
+\PYG{l+s+s2}{group by 1}
+\PYG{l+s+s2}{order by year asc}
+\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
+
+\PYG{n}{sums}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\section{Describing the Data}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:describing-the-data}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{toPandas}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\section{Cast Data Type}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:cast-data-type}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df2} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fdi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fdi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rnr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rnr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{i}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{i}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
+\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\section{printSchema}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:printschema}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df2}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{feature} \PYG{k+kn}{import} \PYG{n}{VectorAssembler}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{LinearRegression}
+
+\PYG{n}{assembler} \PYG{o}{=} \PYG{n}{VectorAssembler}\PYG{p}{(}\PYG{n}{inputCols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fdi}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{outputCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{train\PYGZus{}df} \PYG{o}{=} \PYG{n}{assembler}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{df2}\PYG{p}{)} 
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{train\PYGZus{}df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\section{Linear Regression in Pyspark}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:linear-regression-in-pyspark}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{lr} \PYG{o}{=} \PYG{n}{LinearRegression}\PYG{p}{(}\PYG{n}{featuresCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{lr\PYGZus{}model} \PYG{o}{=} \PYG{n}{lr}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
+
+\PYG{n}{trainingSummary} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{summary}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Coefficients: }\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{coefficients}\PYG{p}{)}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{RMSE: }\PYG{l+s+si}{\PYGZpc{}f}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{rootMeanSquaredError}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{R2: }\PYG{l+s+si}{\PYGZpc{}f}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{r2}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{lr\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
+\PYG{n}{lr\PYGZus{}predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{evaluation} \PYG{k+kn}{import} \PYG{n}{RegressionEvaluator}
+\PYG{n}{lr\PYGZus{}evaluator} \PYG{o}{=} \PYG{n}{RegressionEvaluator}\PYG{p}{(}\PYG{n}{predictionCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYGZbs{}
+                 \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{metricName}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{r2}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{R Squared (R2) on test data = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{lr\PYGZus{}evaluator}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{(}\PYG{n}{lr\PYGZus{}predictions}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numIterations: }\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{totalIterations}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{objectiveHistory: }\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{objectiveHistory}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{residuals}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{predictions} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{test\PYGZus{}df}\PYG{p}{)}
+\PYG{n}{predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{DecisionTreeRegressor}
+\PYG{n}{dt} \PYG{o}{=} \PYG{n}{DecisionTreeRegressor}\PYG{p}{(}\PYG{n}{featuresCol} \PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{labelCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{dt\PYGZus{}model} \PYG{o}{=} \PYG{n}{dt}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
+\PYG{n}{dt\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{dt\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
+\PYG{n}{dt\PYGZus{}evaluator} \PYG{o}{=} \PYG{n}{RegressionEvaluator}\PYG{p}{(}
+    \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{predictionCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{metricName}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rmse}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{rmse} \PYG{o}{=} \PYG{n}{dt\PYGZus{}evaluator}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{(}\PYG{n}{dt\PYGZus{}predictions}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Root Mean Squared Error (RMSE) on test data = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{rmse}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{GBTRegressor}
+\PYG{n}{gbt} \PYG{o}{=} \PYG{n}{GBTRegressor}\PYG{p}{(}\PYG{n}{featuresCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{labelCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{maxIter}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{)}
+\PYG{n}{gbt\PYGZus{}model} \PYG{o}{=} \PYG{n}{gbt}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
+\PYG{n}{gbt\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{gbt\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
+\PYG{n}{gbt\PYGZus{}predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{prediction}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}
+
+
+\PYG{n}{gbt\PYGZus{}evaluator} \PYG{o}{=} \PYG{n}{RegressionEvaluator}\PYG{p}{(}
+    \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{predictionCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{metricName}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rmse}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{rmse} \PYG{o}{=} \PYG{n}{gbt\PYGZus{}evaluator}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{(}\PYG{n}{gbt\PYGZus{}predictions}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Root Mean Squared Error (RMSE) on test data = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{rmse}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\chapter{Group By and Aggregation with Pyspark}
+\label{\detokenize{2020-08-17-Pyspark-Group-By:group-by-and-aggregation-with-pyspark}}\label{\detokenize{2020-08-17-Pyspark-Group-By::doc}}\begin{quote}
+
+“Group By and Aggregation with Pyspark”
+\end{quote}
+\begin{itemize}
+\item {} 
+toc: true\sphinxhyphen{} branch: master\sphinxhyphen{} badges: true
+
+\item {} 
+comments: true
+
+\item {} 
+author: David Kearney
+
+\item {} 
+categories: {[}pyspark, jupyter{]}
+
+\item {} 
+description: Group By and Aggregation with Pyspark
+
+\item {} 
+title: Group By and Aggregation with Pyspark
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
+
+
+\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
+\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
+\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Count}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Max}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Min}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{min}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Sum}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Max it across everything}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{agg}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{grouped} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{grouped}\PYG{o}{.}\PYG{n}{agg}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{countDistinct}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{countDistinct}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Distinct Region}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{avg}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{format\PYGZus{}number}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{specific\PYGZus{}std} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{desc}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\chapter{Handling Missing Data with Pyspark}
+\label{\detokenize{2020-08-18-Pyspark-NAs:handling-missing-data-with-pyspark}}\label{\detokenize{2020-08-18-Pyspark-NAs::doc}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
+
+\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
+\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
+\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Has to have at least 2 NON\PYGZhy{}null values}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{thresh}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Drop any row that contains missing data}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{how}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{any}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{how}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{all}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{example}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{example}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Mean Imputation}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{mean}
+\PYG{n}{mean\PYGZus{}val} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{mean\PYGZus{}val}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{mean\PYGZus{}gen} \PYG{o}{=} \PYG{n}{mean\PYGZus{}val}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{n}{mean\PYGZus{}gen}\PYG{p}{,}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\chapter{Dataframe Filitering and Operations with Pyspark}
+\label{\detokenize{2020-08-19-Pyspark-Filtering:dataframe-filitering-and-operations-with-pyspark}}\label{\detokenize{2020-08-19-Pyspark-Filtering::doc}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+
+\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
+\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
+\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZlt{}10000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZlt{}10000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{province}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZlt{}10000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{province}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{10000}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{55000}\PYG{p}{)} \PYG{o}{\PYGZam{}} \PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{200}\PYG{p}{)} \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{55000}\PYG{p}{)} \PYG{o}{|} \PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{20000}\PYG{p}{)} \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{55000}\PYG{p}{)} \PYG{o}{\PYGZam{}} \PYG{o}{\PYGZti{}}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{20000}\PYG{p}{)} \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mf}{8964.0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Zhejiang}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mf}{8964.0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mf}{8964.0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n+nb}{type}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{row} \PYG{o}{=} \PYG{n}{result}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{row}\PYG{o}{.}\PYG{n}{asDict}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k}{for} \PYG{n}{item} \PYG{o+ow}{in} \PYG{n}{result}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{item}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\chapter{Dataframes, Formatting, Casting Data Type and Correlation with Pyspark}
+\label{\detokenize{2020-08-20-Pyspark-Dataframes-Data-Types:dataframes-formatting-casting-data-type-and-correlation-with-pyspark}}\label{\detokenize{2020-08-20-Pyspark-Dataframes-Data-Types::doc}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+
+\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
+\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
+\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{columns}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} for row in df.head(5):}
+\PYG{c+c1}{\PYGZsh{}     print(row)}
+\PYG{c+c1}{\PYGZsh{}     print(\PYGZsq{}\PYGZbs{}n\PYGZsq{})}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{format\PYGZus{}number}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{result}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{province}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
+\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{int}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rnr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{int}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rnr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fdi}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{int}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fdi}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{p}{,}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{reg}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{string}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{reg}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+             \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df2} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZus{}gdp\PYGZus{}ratio}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{/}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{*}\PYG{l+m+mi}{100}\PYG{p}{)}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}.show()}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df2}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific\PYGZus{}gdp\PYGZus{}ratio}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{asc}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{head}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{mean}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n+nb}{max}\PYG{p}{,}\PYG{n+nb}{min}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n+nb}{min}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific \PYGZlt{} 60000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{60000}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{count}
+\PYG{n}{result} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{60000}\PYG{p}{)}
+\PYG{n}{result}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{count}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{\PYGZgt{}}\PYG{l+m+mi}{8000}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{o}{*}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{df}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{*}\PYG{l+m+mi}{100}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{corr}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{corr}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fdi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{year}
+\PYG{c+c1}{\PYGZsh{}yeardf = df.withColumn(\PYGZdq{}Year\PYGZdq{},year(df[\PYGZdq{}year\PYGZdq{}]))}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{max\PYGZus{}df} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{max\PYGZus{}df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max(gdp)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{month}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}df.select(\PYGZdq{}year\PYGZdq{},\PYGZdq{}avg(gdp)\PYGZdq{}).orderBy(\PYGZsq{}year\PYGZsq{}).show()}
+\end{sphinxVerbatim}
+
+
 \chapter{RDDs and Schemas and Data Types with Pyspark}
 \label{\detokenize{2020-08-21-RDDs and Schemas and Data Types with Pyspark:rdds-and-schemas-and-data-types-with-pyspark}}\label{\detokenize{2020-08-21-RDDs and Schemas and Data Types with Pyspark::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -439,79 +993,6 @@ Note: Pivot Dataframes
 \end{sphinxVerbatim}
 
 
-\chapter{Dataframe Filitering and Operations with Pyspark}
-\label{\detokenize{2020-08-19-Pyspark-Filtering:dataframe-filitering-and-operations-with-pyspark}}\label{\detokenize{2020-08-19-Pyspark-Filtering::doc}}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
-
-\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
-\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
-\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZlt{}10000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZlt{}10000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{province}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZlt{}10000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{province}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{10000}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{55000}\PYG{p}{)} \PYG{o}{\PYGZam{}} \PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{200}\PYG{p}{)} \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{55000}\PYG{p}{)} \PYG{o}{|} \PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{20000}\PYG{p}{)} \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{55000}\PYG{p}{)} \PYG{o}{\PYGZam{}} \PYG{o}{\PYGZti{}}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{20000}\PYG{p}{)} \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mf}{8964.0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Zhejiang}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mf}{8964.0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{result} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{==} \PYG{l+m+mf}{8964.0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n+nb}{type}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{row} \PYG{o}{=} \PYG{n}{result}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{row}\PYG{o}{.}\PYG{n}{asDict}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k}{for} \PYG{n}{item} \PYG{o+ow}{in} \PYG{n}{result}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{:}
-    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{item}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-
 \chapter{Linear Regression and Random Forest/GBT Classification with Pyspark}
 \label{\detokenize{2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark:linear-regression-and-random-forest-gbt-classification-with-pyspark}}\label{\detokenize{2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -743,479 +1224,6 @@ Note: Pivot Dataframes
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{corr}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific\PYGZus{}classification}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-
-\chapter{Pyspark Regression with Fiscal Data}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:pyspark-regression-with-fiscal-data}}\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression::doc}}
-
-\section{Bring in needed imports}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:bring-in-needed-imports}}\begin{quote}
-
-“A minimal example of using Pyspark for Linear Regression”
-\end{quote}
-\begin{itemize}
-\item {} 
-toc: true\sphinxhyphen{} branch: master\sphinxhyphen{} badges: true
-
-\item {} 
-comments: true
-
-\item {} 
-author: David Kearney
-
-\item {} 
-categories: {[}pyspark, jupyter{]}
-
-\item {} 
-description: A minimal example of using Pyspark for Linear Regression
-
-\item {} 
-title: Pyspark Regression with Fiscal Data
-
-\end{itemize}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{col}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{types} \PYG{k+kn}{import} \PYG{n}{StringType}\PYG{p}{,}\PYG{n}{BooleanType}\PYG{p}{,}\PYG{n}{DateType}\PYG{p}{,}\PYG{n}{IntegerType}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{o}{*}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Load data from a CSV}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{}collapse\PYGZhy{}hide}
-
-\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
-\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
-\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{createOrReplaceTempView}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fiscal\PYGZus{}stats}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\PYG{n}{sums} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{sql}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
-\PYG{l+s+s2}{select year, sum(it) as total\PYGZus{}yearly\PYGZus{}it, sum(fr) as total\PYGZus{}yearly\PYGZus{}fr}
-\PYG{l+s+s2}{from fiscal\PYGZus{}stats}
-\PYG{l+s+s2}{group by 1}
-\PYG{l+s+s2}{order by year asc}
-\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}\PYG{p}{)}
-
-\PYG{n}{sums}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-
-\section{Describing the Data}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:describing-the-data}}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{toPandas}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df2} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fdi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fdi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rnr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rnr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{i}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{i}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)} \PYGZbs{}
-\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{col}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df2}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{feature} \PYG{k+kn}{import} \PYG{n}{VectorAssembler}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{LinearRegression}
-
-\PYG{n}{assembler} \PYG{o}{=} \PYG{n}{VectorAssembler}\PYG{p}{(}\PYG{n}{inputCols}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fdi}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{,} \PYG{n}{outputCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{train\PYGZus{}df} \PYG{o}{=} \PYG{n}{assembler}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{df2}\PYG{p}{)} 
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{train\PYGZus{}df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{year}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{lr} \PYG{o}{=} \PYG{n}{LinearRegression}\PYG{p}{(}\PYG{n}{featuresCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{n}{lr\PYGZus{}model} \PYG{o}{=} \PYG{n}{lr}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
-
-\PYG{n}{trainingSummary} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{summary}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Coefficients: }\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{coefficients}\PYG{p}{)}\PYG{p}{)}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{RMSE: }\PYG{l+s+si}{\PYGZpc{}f}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{rootMeanSquaredError}\PYG{p}{)}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{R2: }\PYG{l+s+si}{\PYGZpc{}f}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{r2}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{lr\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
-\PYG{n}{lr\PYGZus{}predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{evaluation} \PYG{k+kn}{import} \PYG{n}{RegressionEvaluator}
-\PYG{n}{lr\PYGZus{}evaluator} \PYG{o}{=} \PYG{n}{RegressionEvaluator}\PYG{p}{(}\PYG{n}{predictionCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYGZbs{}
-                 \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{metricName}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{r2}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{R Squared (R2) on test data = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{lr\PYGZus{}evaluator}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{(}\PYG{n}{lr\PYGZus{}predictions}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{numIterations: }\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{totalIterations}\PYG{p}{)}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{objectiveHistory: }\PYG{l+s+si}{\PYGZpc{}s}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{objectiveHistory}\PYG{p}{)}\PYG{p}{)}
-\PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{residuals}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{predictions} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{test\PYGZus{}df}\PYG{p}{)}
-\PYG{n}{predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{DecisionTreeRegressor}
-\PYG{n}{dt} \PYG{o}{=} \PYG{n}{DecisionTreeRegressor}\PYG{p}{(}\PYG{n}{featuresCol} \PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{labelCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{n}{dt\PYGZus{}model} \PYG{o}{=} \PYG{n}{dt}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
-\PYG{n}{dt\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{dt\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
-\PYG{n}{dt\PYGZus{}evaluator} \PYG{o}{=} \PYG{n}{RegressionEvaluator}\PYG{p}{(}
-    \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{predictionCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{metricName}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rmse}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{rmse} \PYG{o}{=} \PYG{n}{dt\PYGZus{}evaluator}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{(}\PYG{n}{dt\PYGZus{}predictions}\PYG{p}{)}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Root Mean Squared Error (RMSE) on test data = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{rmse}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{GBTRegressor}
-\PYG{n}{gbt} \PYG{o}{=} \PYG{n}{GBTRegressor}\PYG{p}{(}\PYG{n}{featuresCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{labelCol} \PYG{o}{=} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{maxIter}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{)}
-\PYG{n}{gbt\PYGZus{}model} \PYG{o}{=} \PYG{n}{gbt}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
-\PYG{n}{gbt\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{gbt\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
-\PYG{n}{gbt\PYGZus{}predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{prediction}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{features}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}
-
-
-\PYG{n}{gbt\PYGZus{}evaluator} \PYG{o}{=} \PYG{n}{RegressionEvaluator}\PYG{p}{(}
-    \PYG{n}{labelCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{predictionCol}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{metricName}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{rmse}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{rmse} \PYG{o}{=} \PYG{n}{gbt\PYGZus{}evaluator}\PYG{o}{.}\PYG{n}{evaluate}\PYG{p}{(}\PYG{n}{gbt\PYGZus{}predictions}\PYG{p}{)}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Root Mean Squared Error (RMSE) on test data = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{rmse}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-
-\chapter{Dataframes, Formatting, Casting Data Type and Correlation with Pyspark}
-\label{\detokenize{2020-08-20-Pyspark-Dataframes-Data-Types:dataframes-formatting-casting-data-type-and-correlation-with-pyspark}}\label{\detokenize{2020-08-20-Pyspark-Dataframes-Data-Types::doc}}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
-
-\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
-\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
-\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{columns}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} for row in df.head(5):}
-\PYG{c+c1}{\PYGZsh{}     print(row)}
-\PYG{c+c1}{\PYGZsh{}     print(\PYGZsq{}\PYGZbs{}n\PYGZsq{})}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{format\PYGZus{}number}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{result} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}
-\PYG{n}{result}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{province}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}
-\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{int}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{gdp}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rnr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{int}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rnr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{rr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fdi}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{int}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fdi}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{float}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{,}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{it}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-\PYG{p}{,}\PYG{n}{result}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{reg}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{cast}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{string}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{reg}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-             \PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df2} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{withColumn}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific\PYGZus{}gdp\PYGZus{}ratio}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{/}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{*}\PYG{l+m+mi}{100}\PYG{p}{)}\PYG{p}{)}\PYG{c+c1}{\PYGZsh{}.show()}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df2}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific\PYGZus{}gdp\PYGZus{}ratio}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{asc}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{head}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{mean}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n+nb}{max}\PYG{p}{,}\PYG{n+nb}{min}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n+nb}{max}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{,}\PYG{n+nb}{min}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific \PYGZlt{} 60000}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{60000}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{count}
-\PYG{n}{result} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{60000}\PYG{p}{)}
-\PYG{n}{result}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{count}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{filter}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{\PYGZgt{}}\PYG{l+m+mi}{8000}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{o}{*}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{df}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{*}\PYG{l+m+mi}{100}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{corr}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{corr}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{gdp}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fdi}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{year}
-\PYG{c+c1}{\PYGZsh{}yeardf = df.withColumn(\PYGZdq{}Year\PYGZdq{},year(df[\PYGZdq{}year\PYGZdq{}]))}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{max\PYGZus{}df} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{max\PYGZus{}df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{year}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max(gdp)}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{month}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{}df.select(\PYGZdq{}year\PYGZdq{},\PYGZdq{}avg(gdp)\PYGZdq{}).orderBy(\PYGZsq{}year\PYGZsq{}).show()}
-\end{sphinxVerbatim}
-
-
-\chapter{Handling Missing Data with Pyspark}
-\label{\detokenize{2020-08-18-Pyspark-NAs:handling-missing-data-with-pyspark}}\label{\detokenize{2020-08-18-Pyspark-NAs::doc}}
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
-
-\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
-\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
-\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Has to have at least 2 NON\PYGZhy{}null values}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{thresh}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Drop any row that contains missing data}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{how}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{any}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{how}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{all}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{example}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{example}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{fr}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Mean Imputation}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{mean}
-\PYG{n}{mean\PYGZus{}val} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{mean\PYGZus{}val}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{mean\PYGZus{}gen} \PYG{o}{=} \PYG{n}{mean\PYGZus{}val}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{n}{mean\PYGZus{}gen}\PYG{p}{,}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-
-\chapter{Group By and Aggregation with Pyspark}
-\label{\detokenize{2020-08-17-Pyspark-Group-By:group-by-and-aggregation-with-pyspark}}\label{\detokenize{2020-08-17-Pyspark-Group-By::doc}}\begin{quote}
-
-“Group By and Aggregation with Pyspark”
-\end{quote}
-\begin{itemize}
-\item {} 
-toc: true\sphinxhyphen{} branch: master\sphinxhyphen{} badges: true
-
-\item {} 
-comments: true
-
-\item {} 
-author: David Kearney
-
-\item {} 
-categories: {[}pyspark, jupyter{]}
-
-\item {} 
-description: Group By and Aggregation with Pyspark
-
-\item {} 
-title: Group By and Aggregation with Pyspark
-
-\end{itemize}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
-
-
-\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
-\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
-\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Count}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Max}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Min}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{min}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Sum}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Max it across everything}
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{agg}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{grouped} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{grouped}\PYG{o}{.}\PYG{n}{agg}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{countDistinct}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{countDistinct}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Distinct Region}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{avg}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{format\PYGZus{}number}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{specific\PYGZus{}std} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
-\PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
-\end{sphinxVerbatim}
-
-\begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{desc}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 

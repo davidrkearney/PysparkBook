@@ -1,7 +1,5 @@
 # Pyspark Regression with Fiscal Data
 
-## Bring in needed imports
-
 > "A minimal example of using Pyspark for Linear Regression"
 
 - toc: true- branch: master- badges: true
@@ -11,11 +9,13 @@
 - description: A minimal example of using Pyspark for Linear Regression
 - title: Pyspark Regression with Fiscal Data
 
+## Bring in needed imports
+
 from pyspark.sql.functions import col
 from pyspark.sql.types import StringType,BooleanType,DateType,IntegerType
 from pyspark.sql.functions import *
 
-## Load data from a CSV
+## Load data from CSV
 
 #collapse-hide
 
@@ -41,6 +41,8 @@ sums.show()
 df.describe().toPandas().transpose()
 
 
+## Cast Data Type
+
 df2 = df.withColumn("gdp",col("gdp").cast(IntegerType())) \
 .withColumn("specific",col("specific").cast(IntegerType())) \
 .withColumn("general",col("general").cast(IntegerType())) \
@@ -51,6 +53,8 @@ df2 = df.withColumn("gdp",col("gdp").cast(IntegerType())) \
 .withColumn("i",col("i").cast(IntegerType())) \
 .withColumn("fr",col("fr").cast(IntegerType()))
 
+## printSchema
+
 df2.printSchema()
 
 from pyspark.ml.feature import VectorAssembler
@@ -60,6 +64,8 @@ assembler = VectorAssembler(inputCols=['gdp', 'fdi'], outputCol="features")
 train_df = assembler.transform(df2) 
 
 train_df.select("specific", "year").show()
+
+## Linear Regression in Pyspark
 
 lr = LinearRegression(featuresCol = 'features', labelCol='it')
 lr_model = lr.fit(train_df)
