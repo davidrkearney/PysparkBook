@@ -116,6 +116,11 @@
    7. Handling Missing Data with Pyspark
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="2020-08-17-Pyspark-Group-By.html">
+   8. Group By and Aggregation with Pyspark
+  </a>
+ </li>
 </ul>
 
 </nav>
@@ -198,7 +203,12 @@
 <h1><span class="section-number">2. </span>Window functions and Pivot Tables with Pyspark<a class="headerlink" href="#window-functions-and-pivot-tables-with-pyspark" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_schema</span> <span class="o">=</span> <span class="p">[</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
+<span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">StructField</span><span class="p">,</span><span class="n">StringType</span><span class="p">,</span><span class="n">IntegerType</span><span class="p">,</span><span class="n">StructType</span><span class="p">,</span> <span class="n">DoubleType</span><span class="p">,</span> <span class="n">FloatType</span>
+<span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="n">data_schema</span> <span class="o">=</span> <span class="p">[</span>
 <span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;_c0&quot;</span><span class="p">,</span> <span class="n">IntegerType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">)</span>
 <span class="p">,</span><span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;province&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">)</span>
 <span class="p">,</span><span class="n">StructField</span><span class="p">(</span><span class="s2">&quot;specific&quot;</span><span class="p">,</span> <span class="n">DoubleType</span><span class="p">(),</span> <span class="kc">True</span><span class="p">)</span>

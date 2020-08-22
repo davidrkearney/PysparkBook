@@ -39,6 +39,7 @@
     <script async="async" src="_static/sphinx-thebe.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="8. Group By and Aggregation with Pyspark" href="2020-08-17-Pyspark-Group-By.html" />
     <link rel="prev" title="6. Dataframes, Formatting, Casting Data Type and Correlation with Pyspark" href="2020-08-20-Pyspark-Dataframes-Data-Types.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -113,6 +114,11 @@
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    7. Handling Missing Data with Pyspark
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="2020-08-17-Pyspark-Group-By.html">
+   8. Group By and Aggregation with Pyspark
   </a>
  </li>
 </ul>
@@ -197,7 +203,10 @@
 <h1><span class="section-number">7. </span>Handling Missing Data with Pyspark<a class="headerlink" href="#handling-missing-data-with-pyspark" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load data from a CSV</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">SparkSession</span>
+<span class="kn">from</span> <span class="nn">pyspark.sql.functions</span> <span class="kn">import</span> <span class="n">countDistinct</span><span class="p">,</span> <span class="n">avg</span><span class="p">,</span><span class="n">stddev</span>
+
+<span class="c1"># Load data from a CSV</span>
 <span class="n">file_location</span> <span class="o">=</span> <span class="s2">&quot;/FileStore/tables/df_panel_fix.csv&quot;</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;CSV&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;inferSchema&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_location</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
@@ -897,13 +906,13 @@ only showing top 20 rows
             mode: "python"
         },
         kernelOptions: {
-            kernelName: "python3",
+            kernelName: "python_defaultSpec_1597757849731",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'python_defaultSpec_1597757849731'</script>
 
               </div>
               
@@ -914,6 +923,7 @@ only showing top 20 rows
     <div class='prev-next-bottom'>
         
     <a class='left-prev' id="prev-link" href="2020-08-20-Pyspark-Dataframes-Data-Types.html" title="previous page"><span class="section-number">6. </span>Dataframes, Formatting, Casting Data Type and Correlation with Pyspark</a>
+    <a class='right-next' id="next-link" href="2020-08-17-Pyspark-Group-By.html" title="next page"><span class="section-number">8. </span>Group By and Aggregation with Pyspark</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">

@@ -72,7 +72,7 @@
 
 
 \title{Data Science with PySpark}
-\date{Aug 21, 2020}
+\date{Aug 22, 2020}
 \release{}
 \author{David Kearney}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -98,6 +98,8 @@ Data Science with PySpark
 \chapter{RDDs and Schemas and Data Types with Pyspark}
 \label{\detokenize{2020-08-21-RDDs and Schemas and Data Types with Pyspark:rdds-and-schemas-and-data-types-with-pyspark}}\label{\detokenize{2020-08-21-RDDs and Schemas and Data Types with Pyspark::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+
 \PYG{c+c1}{\PYGZsh{} Load data from a CSV}
 \PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
 \PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
@@ -242,6 +244,11 @@ Data Science with PySpark
 \chapter{Window functions and Pivot Tables with Pyspark}
 \label{\detokenize{2020-08-22-Window functions and Pivot Tables with Pyspark:window-functions-and-pivot-tables-with-pyspark}}\label{\detokenize{2020-08-22-Window functions and Pivot Tables with Pyspark::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{types} \PYG{k+kn}{import} \PYG{n}{StructField}\PYG{p}{,}\PYG{n}{StringType}\PYG{p}{,}\PYG{n}{IntegerType}\PYG{p}{,}\PYG{n}{StructType}\PYG{p}{,} \PYG{n}{DoubleType}\PYG{p}{,} \PYG{n}{FloatType}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{o}{*}
+
+
 \PYG{n}{data\PYGZus{}schema} \PYG{o}{=} \PYG{p}{[}
 \PYG{n}{StructField}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}c0}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}
 \PYG{p}{,}\PYG{n}{StructField}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{StringType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}
@@ -435,6 +442,8 @@ Note: Pivot Dataframes
 \chapter{Dataframe Filitering and Operations with Pyspark}
 \label{\detokenize{2020-08-19-Pyspark-Filtering:dataframe-filitering-and-operations-with-pyspark}}\label{\detokenize{2020-08-19-Pyspark-Filtering::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+
 \PYG{c+c1}{\PYGZsh{} Load data from a CSV}
 \PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
 \PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
@@ -506,6 +515,10 @@ Note: Pivot Dataframes
 \chapter{Linear Regression and Random Forest/GBT Classification with Pyspark}
 \label{\detokenize{2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark:linear-regression-and-random-forest-gbt-classification-with-pyspark}}\label{\detokenize{2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{types} \PYG{k+kn}{import} \PYG{n}{StructField}\PYG{p}{,}\PYG{n}{StringType}\PYG{p}{,}\PYG{n}{IntegerType}\PYG{p}{,}\PYG{n}{StructType}\PYG{p}{,} \PYG{n}{DoubleType}\PYG{p}{,} \PYG{n}{FloatType}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{o}{*}
+
 \PYG{n}{data\PYGZus{}schema} \PYG{o}{=} \PYG{p}{[}
 \PYG{n}{StructField}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}c0}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{IntegerType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}
 \PYG{p}{,}\PYG{n}{StructField}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{StringType}\PYG{p}{(}\PYG{p}{)}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}
@@ -734,7 +747,10 @@ Note: Pivot Dataframes
 
 
 \chapter{Pyspark Regression with Fiscal Data}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:pyspark-regression-with-fiscal-data}}\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression::doc}}\begin{quote}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:pyspark-regression-with-fiscal-data}}\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression::doc}}
+
+\section{Bring in needed imports}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:bring-in-needed-imports}}\begin{quote}
 
 “A minimal example of using Pyspark for Linear Regression”
 \end{quote}
@@ -759,9 +775,16 @@ title: Pyspark Regression with Fiscal Data
 
 \end{itemize}
 
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{col}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{types} \PYG{k+kn}{import} \PYG{n}{StringType}\PYG{p}{,}\PYG{n}{BooleanType}\PYG{p}{,}\PYG{n}{DateType}\PYG{p}{,}\PYG{n}{IntegerType}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{o}{*}
+\end{sphinxVerbatim}
 
-\section{Loading in the data}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:loading-in-the-data}}
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Load data from a CSV}
+\end{sphinxVerbatim}
+
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{c+c1}{\PYGZsh{}collapse\PYGZhy{}hide}
 
@@ -771,9 +794,6 @@ title: Pyspark Regression with Fiscal Data
 \PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
 \end{sphinxVerbatim}
 
-
-\section{Spark SQL}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:spark-sql}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{createOrReplaceTempView}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{fiscal\PYGZus{}stats}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
 
@@ -787,6 +807,9 @@ title: Pyspark Regression with Fiscal Data
 \PYG{n}{sums}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Describing the Data}
+\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:describing-the-data}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{describe}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{toPandas}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -807,9 +830,6 @@ title: Pyspark Regression with Fiscal Data
 \PYG{n}{df2}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
-
-\section{VectorAssembler and LinearRegression}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:vectorassembler-and-linearregression}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{feature} \PYG{k+kn}{import} \PYG{n}{VectorAssembler}
 \PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{ml}\PYG{n+nn}{.}\PYG{n+nn}{regression} \PYG{k+kn}{import} \PYG{n}{LinearRegression}
@@ -832,9 +852,6 @@ title: Pyspark Regression with Fiscal Data
 \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{R2: }\PYG{l+s+si}{\PYGZpc{}f}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{\PYGZpc{}} \PYG{n}{trainingSummary}\PYG{o}{.}\PYG{n}{r2}\PYG{p}{)}
 \end{sphinxVerbatim}
 
-
-\section{Evaluation and Metrics}
-\label{\detokenize{2020-08-15-Pyspark-Fiscal-Data-Regression:evaluation-and-metrics}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{lr\PYGZus{}predictions} \PYG{o}{=} \PYG{n}{lr\PYGZus{}model}\PYG{o}{.}\PYG{n}{transform}\PYG{p}{(}\PYG{n}{train\PYGZus{}df}\PYG{p}{)}
 \PYG{n}{lr\PYGZus{}predictions}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{prediction}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{features}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}
@@ -888,6 +905,8 @@ title: Pyspark Regression with Fiscal Data
 \chapter{Dataframes, Formatting, Casting Data Type and Correlation with Pyspark}
 \label{\detokenize{2020-08-20-Pyspark-Dataframes-Data-Types:dataframes-formatting-casting-data-type-and-correlation-with-pyspark}}\label{\detokenize{2020-08-20-Pyspark-Dataframes-Data-Types::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+
 \PYG{c+c1}{\PYGZsh{} Load data from a CSV}
 \PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
 \PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
@@ -1005,6 +1024,9 @@ title: Pyspark Regression with Fiscal Data
 \chapter{Handling Missing Data with Pyspark}
 \label{\detokenize{2020-08-18-Pyspark-NAs:handling-missing-data-with-pyspark}}\label{\detokenize{2020-08-18-Pyspark-NAs::doc}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
+
 \PYG{c+c1}{\PYGZsh{} Load data from a CSV}
 \PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
 \PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
@@ -1073,6 +1095,127 @@ title: Pyspark Regression with Fiscal Data
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{,}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\chapter{Group By and Aggregation with Pyspark}
+\label{\detokenize{2020-08-17-Pyspark-Group-By:group-by-and-aggregation-with-pyspark}}\label{\detokenize{2020-08-17-Pyspark-Group-By::doc}}\begin{quote}
+
+“Group By and Aggregation with Pyspark”
+\end{quote}
+\begin{itemize}
+\item {} 
+toc: true\sphinxhyphen{} branch: master\sphinxhyphen{} badges: true
+
+\item {} 
+comments: true
+
+\item {} 
+author: David Kearney
+
+\item {} 
+categories: {[}pyspark, jupyter{]}
+
+\item {} 
+description: Group By and Aggregation with Pyspark
+
+\item {} 
+title: Group By and Aggregation with Pyspark
+
+\end{itemize}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
+
+
+\PYG{c+c1}{\PYGZsh{} Load data from a CSV}
+\PYG{n}{file\PYGZus{}location} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{/FileStore/tables/df\PYGZus{}panel\PYGZus{}fix.csv}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{df} \PYG{o}{=} \PYG{n}{spark}\PYG{o}{.}\PYG{n}{read}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{CSV}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{inferSchema}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{option}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{header}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{k+kc}{True}\PYG{p}{)}\PYG{o}{.}\PYG{n}{load}\PYG{p}{(}\PYG{n}{file\PYGZus{}location}\PYG{p}{)}
+\PYG{n}{display}\PYG{p}{(}\PYG{n}{df}\PYG{o}{.}\PYG{n}{take}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Count}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{count}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Max}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{max}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Min}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{min}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Sum}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{} Max it across everything}
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{agg}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{grouped} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{grouped}\PYG{o}{.}\PYG{n}{agg}\PYG{p}{(}\PYG{p}{\PYGZob{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{it}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{:}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{max}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{countDistinct}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{countDistinct}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{reg}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Distinct Region}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{avg}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{specific}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{format\PYGZus{}number}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{specific\PYGZus{}std} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{alias}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{o}{.}\PYG{n}{desc}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 

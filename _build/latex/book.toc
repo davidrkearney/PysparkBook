@@ -4,9 +4,8 @@
 \contentsline {chapter}{\numberline {3}Dataframe Filitering and Operations with Pyspark}{9}{chapter.3}
 \contentsline {chapter}{\numberline {4}Linear Regression and Random Forest/GBT Classification with Pyspark}{11}{chapter.4}
 \contentsline {chapter}{\numberline {5}Pyspark Regression with Fiscal Data}{15}{chapter.5}
-\contentsline {section}{\numberline {5.1}Loading in the data}{15}{section.5.1}
-\contentsline {section}{\numberline {5.2}Spark SQL}{15}{section.5.2}
-\contentsline {section}{\numberline {5.3}VectorAssembler and LinearRegression}{16}{section.5.3}
-\contentsline {section}{\numberline {5.4}Evaluation and Metrics}{16}{section.5.4}
+\contentsline {section}{\numberline {5.1}Bring in needed imports}{15}{section.5.1}
+\contentsline {section}{\numberline {5.2}Describing the Data}{16}{section.5.2}
 \contentsline {chapter}{\numberline {6}Dataframes, Formatting, Casting Data Type and Correlation with Pyspark}{19}{chapter.6}
 \contentsline {chapter}{\numberline {7}Handling Missing Data with Pyspark}{21}{chapter.7}
+\contentsline {chapter}{\numberline {8}Group By and Aggregation with Pyspark}{23}{chapter.8}

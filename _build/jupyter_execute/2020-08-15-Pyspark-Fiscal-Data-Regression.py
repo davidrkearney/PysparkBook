@@ -1,5 +1,7 @@
 # Pyspark Regression with Fiscal Data
 
+## Bring in needed imports
+
 > "A minimal example of using Pyspark for Linear Regression"
 
 - toc: true- branch: master- badges: true
@@ -9,7 +11,11 @@
 - description: A minimal example of using Pyspark for Linear Regression
 - title: Pyspark Regression with Fiscal Data
 
-## Loading in the data
+from pyspark.sql.functions import col
+from pyspark.sql.types import StringType,BooleanType,DateType,IntegerType
+from pyspark.sql.functions import *
+
+## Load data from a CSV
 
 #collapse-hide
 
@@ -18,8 +24,6 @@ file_location = "/FileStore/tables/df_panel_fix.csv"
 df = spark.read.format("CSV").option("inferSchema", True).option("header", True).load(file_location)
 display(df.take(5))
 
-
-## Spark SQL
 
 df.createOrReplaceTempView("fiscal_stats")
 
@@ -31,6 +35,8 @@ order by year asc
 """)
 
 sums.show()
+
+## Describing the Data
 
 df.describe().toPandas().transpose()
 
@@ -46,8 +52,6 @@ df2 = df.withColumn("gdp",col("gdp").cast(IntegerType())) \
 .withColumn("fr",col("fr").cast(IntegerType()))
 
 df2.printSchema()
-
-## VectorAssembler and LinearRegression
 
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.regression import LinearRegression
@@ -65,8 +69,6 @@ print("Coefficients: " + str(lr_model.coefficients))
 print("RMSE: %f" % trainingSummary.rootMeanSquaredError)
 print("R2: %f" % trainingSummary.r2)
 
-
-## Evaluation and Metrics
 
 lr_predictions = lr_model.transform(train_df)
 lr_predictions.select("prediction","it","features").show(5)
