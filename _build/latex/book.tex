@@ -408,13 +408,18 @@ title: Group By and Aggregation with Pyspark
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Dropping Columns without non\sphinxhyphen{}null values}
+\label{\detokenize{2020-08-18-Pyspark-NAs:dropping-columns-without-non-null-values}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{c+c1}{\PYGZsh{} Has to have at least 2 NON\PYGZhy{}null values}
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{thresh}\PYG{o}{=}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Dropping any row that contains missing data}
+\label{\detokenize{2020-08-18-Pyspark-NAs:dropping-any-row-that-contains-missing-data}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Drop any row that contains missing data}
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
@@ -430,10 +435,16 @@ title: Group By and Aggregation with Pyspark
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{drop}\PYG{p}{(}\PYG{n}{how}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{all}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Imputation of Null Values}
+\label{\detokenize{2020-08-18-Pyspark-NAs:imputation-of-null-values}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{example}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\subsection{Imputation of 0}
+\label{\detokenize{2020-08-18-Pyspark-NAs:imputation-of-0}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -446,8 +457,10 @@ title: Group By and Aggregation with Pyspark
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{na}\PYG{o}{.}\PYG{n}{fill}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{n}{subset}\PYG{o}{=}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\subsection{Imputation of the Mean}
+\label{\detokenize{2020-08-18-Pyspark-NAs:imputation-of-the-mean}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{c+c1}{\PYGZsh{} Mean Imputation}
 \PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{mean}
 \PYG{n}{mean\PYGZus{}val} \PYG{o}{=} \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{df}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{general}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{]}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{collect}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
