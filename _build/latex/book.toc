@@ -7,6 +7,10 @@
 \contentsline {section}{\numberline {1.5}printSchema}{4}{section.1.5}
 \contentsline {section}{\numberline {1.6}Linear Regression in Pyspark}{4}{section.1.6}
 \contentsline {chapter}{\numberline {2}Group By and Aggregation with Pyspark}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Read CSV and inferSchema}{7}{section.2.1}
+\contentsline {section}{\numberline {2.2}Using groupBy for Averages and Counts}{7}{section.2.2}
+\contentsline {section}{\numberline {2.3}Choosing Significant Digits with format\_number}{8}{section.2.3}
+\contentsline {section}{\numberline {2.4}Using orderBy}{8}{section.2.4}
 \contentsline {chapter}{\numberline {3}Handling Missing Data with Pyspark}{9}{chapter.3}
 \contentsline {chapter}{\numberline {4}Dataframe Filitering and Operations with Pyspark}{11}{chapter.4}
 \contentsline {chapter}{\numberline {5}Dataframes, Formatting, Casting Data Type and Correlation with Pyspark}{13}{chapter.5}

@@ -9,6 +9,8 @@
 - description: Group By and Aggregation with Pyspark
 - title: Group By and Aggregation with Pyspark
 
+## Read CSV and inferSchema
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import countDistinct, avg,stddev
 
@@ -20,6 +22,8 @@ display(df.take(5))
 
 
 df.printSchema()
+
+## Using groupBy for Averages and Counts
 
 df.groupBy("province")
 
@@ -53,6 +57,8 @@ df.select(avg('specific')).show()
 
 df.select(stddev("specific")).show()
 
+## Choosing Significant Digits with format_number
+
 from pyspark.sql.functions import format_number
 
 
@@ -60,6 +66,8 @@ specific_std = df.select(stddev("specific").alias('std'))
 specific_std.show()
 
 specific_std.select(format_number('std',0)).show()
+
+## Using orderBy
 
 df.orderBy("specific").show()
 

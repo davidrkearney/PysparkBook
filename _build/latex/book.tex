@@ -285,6 +285,9 @@ title: Group By and Aggregation with Pyspark
 
 \end{itemize}
 
+
+\section{Read CSV and inferSchema}
+\label{\detokenize{2020-08-17-Pyspark-Group-By:read-csv-and-inferschema}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql} \PYG{k+kn}{import} \PYG{n}{SparkSession}
 \PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{countDistinct}\PYG{p}{,} \PYG{n}{avg}\PYG{p}{,}\PYG{n}{stddev}
@@ -300,6 +303,9 @@ title: Group By and Aggregation with Pyspark
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{printSchema}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Using groupBy for Averages and Counts}
+\label{\detokenize{2020-08-17-Pyspark-Group-By:using-groupby-for-averages-and-counts}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{groupBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{province}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -358,6 +364,9 @@ title: Group By and Aggregation with Pyspark
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{stddev}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Choosing Significant Digits with format\_number}
+\label{\detokenize{2020-08-17-Pyspark-Group-By:choosing-significant-digits-with-format-number}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{k+kn}{from} \PYG{n+nn}{pyspark}\PYG{n+nn}{.}\PYG{n+nn}{sql}\PYG{n+nn}{.}\PYG{n+nn}{functions} \PYG{k+kn}{import} \PYG{n}{format\PYGZus{}number}
 \end{sphinxVerbatim}
@@ -371,6 +380,9 @@ title: Group By and Aggregation with Pyspark
 \PYG{n}{specific\PYGZus{}std}\PYG{o}{.}\PYG{n}{select}\PYG{p}{(}\PYG{n}{format\PYGZus{}number}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{std}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
 
+
+\section{Using orderBy}
+\label{\detokenize{2020-08-17-Pyspark-Group-By:using-orderby}}
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{df}\PYG{o}{.}\PYG{n}{orderBy}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
 \end{sphinxVerbatim}
