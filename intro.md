@@ -9,5 +9,5 @@ Data Science with PySpark includes code adapted from [Spark and Python for Big D
 ```
 
 
-The data used by this book was developed by `` {cite}`kearney2019ties` `` and {cite}`kearney2019ties`, found in the `{bibliography}`.
+The data used by this book was developed by {cite}`kearney2019ties`.
 
