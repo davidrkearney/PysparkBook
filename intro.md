@@ -12,6 +12,14 @@ Data Science with PySpark includes code adapted from [Spark and Python for Big D
 The data used by this book was developed by {cite}`kearney2019ties`.
 
 
+ 
+## Resilient Distributed Datasets
+
+
+
+[Spark uses Java Virtual Machine (JVM) objects Resilient Distributed Datasets (RDD) which are calculated and stored in memory](https://www.oreilly.com/library/view/data-analytics-with/9781491913734/ch04.html).
+
+
 
 ```{bibliography} references.bib
 ```
