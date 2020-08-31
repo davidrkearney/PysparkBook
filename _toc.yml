@@ -8,6 +8,9 @@ sections:
 - file: 2020-08-20-Pyspark-Dataframes-Data-Types
 - file: 2020-08-21-RDDs and Schemas and Data Types with Pyspark
 - file: 2020-08-22-Window functions and Pivot Tables with Pyspark
+- file: 2020-08-25-Linear Regression and Random Forest_GBT Classification with Pyspark
+- file: 2020-08-29-Clustering with Pyspark
+- file: 2020-08-30-NLP with Pyspark
 - file: 2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark
 
 
