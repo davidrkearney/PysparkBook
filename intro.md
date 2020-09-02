@@ -13,7 +13,7 @@ The data used by this book was developed by {cite}`kearney2019ties`.
 
 
  
-## Resilient Distributed Datasets
+### Resilient Distributed Datasets
 
 
 
