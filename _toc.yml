@@ -1,21 +1,24 @@
-file: intro
-
-numbered: true
+file: 2020-08-22-Window functions and Pivot Tables with Pyspark
 sections:
-- file: 2020-08-15-Pyspark-Fiscal-Data-Regression.ipynb
-- file: 2020-08-16-pandas-stats-fiscal.ipynb
-- file: 2020-08-17-Pyspark-Group-By.ipynb
-- file: 2020-08-18-Pyspark-NAs.ipynb
-- file: 2020-08-19-Pyspark-Filtering
-- file: 2020-08-20-Pyspark-Dataframes-Data-Types
+- file: 2020-09-21-StockMarketPortfolioAnaylsis2
+- file: 2020-09-03-NLP_Seaborn_Heatmaps
 - file: 2020-08-21-RDDs and Schemas and Data Types with Pyspark
-- file: 2020-08-22-Window functions and Pivot Tables with Pyspark
-- file: 2020-08-25-Linear Regression and Random Forest_GBT Classification with Pyspark
-- file: 2020-08-29-Clustering with Pyspark
 - file: 2020-08-30-NLP with Pyspark
-- file: 2020-09-02-NLP_Ngram.ipynb
-- file: 2020-09-03-NLP_Seaborn_Heatmaps.ipynb
-- file: 2020-09-19-StockMarketPortfolioAnaylsis.ipynb
-- file: 2020-09-21-StockMarketPortfolioAnaylsis2.ipynb
-
-
+- file: 2020-08-29-Clustering with Pyspark
+- file: intro
+- file: 2020-08-17-Pyspark-Group-By
+- file: 2020-09-23-AnalyzingUSInflation
+- file: markdown
+- file: README
+- file: 2020-09-19-StockMarketPortfolioAnaylsis
+- file: 2020-08-25-Linear Regression and Random Forest_GBT Classification with Pyspark
+- file: 2020-09-22-AnalyzingUSUnemployment
+- file: 2020-08-19-Pyspark-Filtering
+- file: 2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark
+- file: 2020-08-15-Pyspark-Fiscal-Data-Regression
+- file: 2020-08-20-Pyspark-Dataframes-Data-Types
+- file: 2020-09-02-NLP_Ngram
+- file: 2020-08-18-Pyspark-NAs
+- file: notebooks
+- file: content
+- file: 2020-08-16-pandas-stats-fiscal
