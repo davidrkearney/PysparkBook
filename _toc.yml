@@ -12,6 +12,7 @@ sections:
 - file: README
 - file: 2020-09-19-StockMarketPortfolioAnaylsis
 - file: 2020-08-25-Linear Regression and Random Forest_GBT Classification with Pyspark
+- file: 2020-09-25-AnalyzingSizeofArmedForces
 - file: 2020-09-22-AnalyzingUSUnemployment
 - file: 2020-08-19-Pyspark-Filtering
 - file: 2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark
