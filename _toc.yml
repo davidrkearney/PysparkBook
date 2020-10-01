@@ -21,6 +21,7 @@ sections:
 - file: 2020-08-15-Pyspark-Fiscal-Data-Regression
 - file: 2020-08-20-Pyspark-Dataframes-Data-Types
 - file: 2020-09-02-NLP_Ngram
+- file: 2020-09-30-StockMarketPortfolioAnaylsis_snp
 - file: 2020-08-18-Pyspark-NAs
 - file: notebooks
 - file: content
