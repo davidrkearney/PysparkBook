@@ -1,14 +1,21 @@
 file: 2020-08-22-Window functions and Pivot Tables with Pyspark
 sections:
+- file: 2020-10-13-dask-xgboost-fiscal-data
 - file: 2020-09-30-StockMarketPortfolioAnaylsis
+- file: 2020-10-12-dask-xgboost-fiscal-data.
 - file: 2020-09-21-StockMarketPortfolioAnaylsis2
 - file: 2020-09-03-NLP_Seaborn_Heatmaps
 - file: 2020-08-21-RDDs and Schemas and Data Types with Pyspark
+- file: 2020-10-01-StockMarketPortfolioAnaylsis_snp+
+- file: 2020-10-05-StockMarketPortfolioAnaylsis_snp_pandas_datareader_sqlite-Copy1
 - file: 2020-08-30-NLP with Pyspark
 - file: 2020-08-29-Clustering with Pyspark
+- file: 2020-10-11-dask-xgboost-fiscal-data
 - file: intro
+- file: 2020-10-06-NLP-sqlitedb
 - file: 2020-08-17-Pyspark-Group-By
 - file: 2020-09-23-AnalyzingUSInflation
+- file: 2020-10-09-Dask_Fiscal-Data-Sqlite-db
 - file: markdown
 - file: README
 - file: 2020-09-19-StockMarketPortfolioAnaylsis
@@ -16,14 +23,19 @@ sections:
 - file: 2020-09-25-AnalyzingSizeofArmedForces
 - file: 2020-09-22-AnalyzingUSUnemployment
 - file: 2020-08-19-Pyspark-Filtering
+- file: 2020-10-07-Fiscal_data-sqlitedb-Copy1
 - file: 2020-08-22-Linear Regression and Random Forest_GBT Classification with Pyspark
 - file: 2020-09-28-databases_sqllite_sqlalchemy_27
 - file: 2020-08-15-Pyspark-Fiscal-Data-Regression
 - file: 2020-08-20-Pyspark-Dataframes-Data-Types
+- file: 2020-10-10-Dask_Fiscal-db-to-dask-dataframe
 - file: 2020-09-02-NLP_Ngram
+- file: 2020-10-08-Dask-Day-1
 - file: 2020-09-30-StockMarketPortfolioAnaylsis_snp
 - file: 2020-08-18-Pyspark-NAs
 - file: notebooks
+- file: 2020-10-02-databases_sqllite_sqlalchemy_27-Copy1
 - file: content
 - file: 2020-08-16-pandas-stats-fiscal
+- file: 2020-10-04-StockMarketPortfolioAnaylsis_snp_pandas_datareader_sqlite-Copy1
 - file: 2020-09-24-AnalyzingUSRealInterestRate
