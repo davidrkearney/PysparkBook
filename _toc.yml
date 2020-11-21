@@ -1,4 +1,4 @@
-file: 2020-08-17-Pyspark-Group-By
+file: intro
 sections:
 - file: 2020-08-22-Window functions and Pivot Tables with Pyspark
 - file: notebooks
@@ -24,7 +24,7 @@ sections:
 - file: 2020-10-09-Dask_Fiscal-Data-Sqlite-db
 - file: 2020-10-11-dask-xgboost-fiscal-data
 - file: 2020-11-17-diab_prediction_with_h2o
-- file: intro
+- file: 2020-08-17-Pyspark-Group-By
 - file: 2020-10-16-dask-NLP-gutenberg-books
 - file: 2020-10-15-dask-xgboost-Linear-Regresion-Copy1
 - file: 2020-10-08-Dask-Day-1
