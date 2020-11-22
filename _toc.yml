@@ -1,9 +1,9 @@
 file: intro
 sections:
 
-
+# Setting up:
 - file: setup
-
+- file: git_setup
 
 # EDA with Spark
 - file: 2020-08-17-Pyspark-Group-By
