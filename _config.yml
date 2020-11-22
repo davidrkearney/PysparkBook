@@ -1,11 +1,11 @@
 # Book settings
-title : Data Science with PySpark
+title : Hands On Data Science at Scale with PySpark, Dask and H2O.
 author: David Kearney
 logo: logo.png
 
 # Information about where the book exists on the web
 description: >-
-  A Book on Data Science book with PySpark
+  A Book on Fast Data Science book with PySpark, Dask and H2O.
 
 latex:
   latex_documents:
@@ -18,6 +18,6 @@ latex:
 execute:
   execute_notebooks         : off  # Whether to execute notebooks at build time. Must be one of ("auto", "force", "cache", "off")
   cache                     : ""  # A path to the jupyter cache that will be used to store execution artifacs. Defaults to `_build/.jupyter_cache/`
-  exclude_patterns          : []  # A list of patterns to *skip* in execution (e.g. a notebook that takes a really long time)
+  exclude_patterns          : [fast/*, fast/lib/*]  # A list of patterns to *skip* in execution (e.g. a notebook that takes a really long time)
 
 #######################################################################################

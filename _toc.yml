@@ -1,7 +1,7 @@
 file: intro
 sections:
-
 # Setting up:
+- file: toc
 - file: setup
 - file: git_setup
 
