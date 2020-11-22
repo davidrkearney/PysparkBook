@@ -1,6 +1,7 @@
 # Creating the book:
 
+
 ```
-source scale/bin/activate
+source fast/bin/activate
 jupyter-book clean .
 ```
