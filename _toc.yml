@@ -5,6 +5,11 @@ sections:
 - file: setup
 - file: git_setup
 
+
+# Book building
+- file: building_book
+
+
 # pandas basics
 
 
