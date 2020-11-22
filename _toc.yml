@@ -5,6 +5,13 @@ sections:
 - file: setup
 - file: git_setup
 
+# pandas basics
+
+
+# matplot lib basics
+
+
+
 # EDA with Spark
 - file: 2020-08-17-Pyspark-Group-By
 - file: 2020-08-18-Pyspark-NAs
