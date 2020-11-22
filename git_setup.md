@@ -1,4 +1,4 @@
-# Setting up git configurations:
+# Setting up Version Control/Git Configuration:
 
 ## Setting up user email and name configuration for git:
 
